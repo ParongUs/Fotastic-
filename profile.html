@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>📸 Fotastic - Profil</title>
+  <style>
+    body {
+      background: #121212;
+      color: #eee;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0; padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      color: white;
+      font-size: 2.5em;
+    }
+    #logoutBtn {
+      margin-top: 30px;
+      padding: 12px 25px;
+      background: #dc3545;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.1em;
+    }
+    nav a {
+      color: #4dabf7;
+      text-decoration: none;
+      margin: 0 10px;
+      font-weight: bold;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+    #userInfo {
+      margin-top: 40px;
+      font-size: 1.3em;
+    }
+  </style>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+</head>
+<body>
+
+  <h1>📸 Fotastic - Profil</h1>
+  <nav>
+    <a href="index.html">Ana Sayfa</a> |
+    <a href="gallery.html">Galeri</a>
+  </nav>
+
+  <div id="userInfo">Yükleniyor...</div>
+  <button id="logoutBtn">Çıkış Yap</button>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBS9RuLa8z4BGmIVySH3CjILI0LVQn741Q",
+      authDomain: "fotastic-shared.firebaseapp.com",
+      projectId: "fotastic-shared",
+      storageBucket: "fotastic-shared.appspot.com",
+      messagingSenderId: "175040144929",
+      appId: "1:175040144929:web:25a95972f2d6c8486c6560",
+      measurementId: "G-K19EQ7LQYX"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    const auth = firebase.auth();
+
+    const userInfo = document.getElementById('userInfo');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        userInfo.innerHTML = `
+          <p><strong>Email:</strong> ${user.email}</p>
+          <p><strong>Kullanıcı ID:</strong> ${user.uid}</p>
+        `;
+      } else {
+        userInfo.textContent = "Giriş yapmanız gerekiyor. Ana sayfaya yönlendiriliyorsunuz...";
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 2500);
+      }
+    });
+
+    logoutBtn.onclick = () => {
+      auth.signOut();
+    };
+  </script>
+
+</body>
+</html>

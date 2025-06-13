@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>📸 Fotastic - Galeri</title>
+  <style>
+    body {
+      background: #121212;
+      color: #eee;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0; padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      color: white;
+      font-size: 2.5em;
+      margin-bottom: 0;
+    }
+    .gallery {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+    }
+    .photo-card {
+      background: #222;
+      border-radius: 10px;
+      padding: 10px;
+      width: 180px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.8);
+    }
+    .photo-card img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+    .photo-card p {
+      margin: 6px 0 4px;
+      font-size: 0.9em;
+    }
+    .like-count {
+      color: #bbb;
+    }
+    button.like-btn {
+      background: #ff4081;
+      border: none;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button.like-btn:hover {
+      background: #e040fb;
+    }
+    #backLink {
+      display: inline-block;
+      margin-top: 20px;
+      color: #4dabf7;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+ 
+

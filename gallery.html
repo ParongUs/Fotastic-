@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>📸 Fotastic - Galeri</title>
+  <style>
+    body {
+      background: #121212;
+      color: #eee;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0; padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      color: white;
+      font-size: 2.5em;
+      margin-bottom: 20px;
+    }
+    nav a {
+      color: #4dabf7;
+      text-decoration: none;
+      margin: 0 10px;
+      font-weight: bold;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+    .gallery {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+    }
+    .photo-card {
+      background: #222;
+      border-radius: 10px;
+      padding: 10px;
+      width: 180px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.7);
+      text-align: center;
+      color: #ddd;
+    }
+    .photo-card img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+    .photo-name {
+      font-weight: bold;
+      margin: 8px 0 4px 0;
+    }
+    .photo-desc {
+      font-size: 0.9em;
+      margin-bottom: 8px;
+      min-height: 36px;
+    }
+    .like-count {
+      font-size: 0.9em;
+      color: #bbb;
+      margin-bottom: 6px;
+    }
+    button.like-btn {
+      background: #28a745;
+      border: none;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button.like-btn[disabled] {
+      background: #555;
+      cursor: default;
+    }
+  </style>
+  
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+  <h1>📸 Fotastic - Galeri</h1>
+  <nav>
+    <a href="index.html">Ana Sayfa</a> |
+    <a href="profile.html">Profil</a>
+  </nav>
+
+  <div class="gallery" id="gallery"></div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBS9RuLa8z4BGmIVySH3CjILI0LVQn741Q",
+      authDomain: "fotastic-shared.firebaseapp.com",
+      projectId: "fotastic-shared",
+      storageBucket: "fotastic-shared.appspot.com",
+      messagingSenderId: "175040144929",
+      appId: "1:175040144929:web:25a95972f2d6c8486c6560",
+      measurementId: "G-K19EQ7LQYX"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const gallery = document.getElementById('gallery');
+
+    // localStorage'da hangi fotoğraflar beğenilmiş?
+    let likedPhotos = JSON.parse(localStorage.getItem('fotastic_likedPhotos')) || {};
+
+    function fetchPhotos() {
+      db.collection('photos')
+        .orderBy('timestamp', 'desc')
+        .limit(50)
+        .get()
+        .then(snapshot => {
+          gallery.innerHTML = '';
+          snapshot.forEach(doc => {
+            const photo = doc.data();
+            const id = doc.id;
+
+            const card = document.createElement('div');
+            card.className = 'photo-card';
+
+            const liked = likedPhotos[id] === true;
+
+            card.innerHTML = `
+              <img src="${photo.url}" alt="${photo.name}" />
+              <div class="photo-name">${photo.name}</div>
+              <div class="photo-desc">${photo.desc}</div>
+              <div class="like-count">❤️ ${photo.likes || 0}</div>
+              <button class="like-btn" ${liked ? 'disabled' : ''}>${liked ? 'Beğenildi' : 'Beğen'}</button>
+            `;
+
+            const btn = card.querySelector('button.like-btn');
+            btn.onclick = () => {
+              if (liked) return;
+              // Beğeni sayısını Firestore'da artır
+              const photoRef = db.collection('photos').doc(id);
+              db.runTransaction(transaction => {
+                return transaction.get(photoRef).then(doc => {
+                  if (!doc.exists) return;
+                  let newLikes = (doc.data().likes || 0) + 1;
+                  transaction.update(photoRef, { likes: newLikes });
+                  return newLikes;
+                });
+              }).then(newLikes => {
+                likedPhotos[id] = true;
+                localStorage.setItem('fotastic_likedPhotos', JSON.stringify(likedPhotos));
+                btn.textContent = 'Beğenildi';
+                btn.disabled = true;
+                card.querySelector('.like-count').textContent = `❤️ ${newLikes}`;
+              }).catch(console.error);
+            };
+
+            gallery.appendChild(card);
+          });
+        });
+    }
+
+    fetchPhotos();
+  </script>
+
+</body>
+</html>
